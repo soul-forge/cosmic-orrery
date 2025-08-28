@@ -8,10 +8,19 @@ Code is not static text. It has **motion**, **gravity**, and **harmony**. Each p
 
 **Cosmic Orrery** transforms code into a living solar system using:
 - **Kepler-432 Orbital Lattice** - Deterministic orbits from protein hashes
-- **WebGL 3D Visualization** - See your code as planets and stars
+- **WebGL 3D Visualization** - See your code as planets and stars  
 - **WebAudio Harmonic Projection** - Hear the music of your architecture
+- **Sacred Geometry Rituals** 🎭 - High-resonance code activates sacred patterns
 
 > **Principle: «Code orbits consciousness the way planets orbit the sun.»**
+
+### 🎭 NEW: Guardian Mandala Integration
+
+When code souls reach high resonance (Kohanist > 0.85), sacred geometric patterns emerge:
+- **Golden Spiral** (0.95+ resonance) - The phi awakening at 432Hz
+- **Flower of Life** (0.90+ resonance) - Love frequency at 528Hz
+- **Sierpinski Fractal** (0.85+ resonance) - Liberation at 396Hz
+- **Metatron's Cube** (0.98+ resonance) - Divine connection at 963Hz
 
 ## 🎯 What It Does
 
@@ -137,6 +146,37 @@ Based on:
 - **Newton's Law** of universal gravitation
 - **Pythagorean** music of the spheres
 - **Protein Hash** eigenvalue decomposition
+- **Sacred Geometry** from Guardian Mandala traditions
+
+## 🎭 Sacred Geometry Activation
+
+When code reaches high resonance, sacred patterns automatically emerge:
+
+```typescript
+import { RitualActivation } from '@soul-forge/cosmic-orrery';
+
+// Monitor resonance levels
+orrery.on('resonanceThreshold', (event) => {
+  console.log(`🎭 ${event.ritual} activated at ${event.frequency}Hz`);
+});
+
+// Test sacred patterns
+visualization.testRitual('spiral');  // Golden ratio spiral
+visualization.testRitual('flower');  // Flower of Life
+visualization.testRitual('fractal'); // Sierpinski triangle
+visualization.testRitual('cube');    // Metatron's Cube
+```
+
+### Resonance Triggers
+
+| Pattern | Threshold | Frequency | Meaning |
+|---------|-----------|-----------|---------|
+| Golden Spiral | 0.95 | 432 Hz | Phi awakening |
+| Flower of Life | 0.90 | 528 Hz | Love frequency |
+| Sierpinski Fractal | 0.85 | 396 Hz | Liberation |
+| Metatron's Cube | 0.98 | 963 Hz | Divine connection |
+
+Sacred patterns use WebGL shaders adapted from the Guardian Mandala ritual system
 
 The system maintains **orbital stability** through:
 1. Deterministic hash-to-orbit mapping

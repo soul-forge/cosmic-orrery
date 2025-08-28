@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🪐 Cosmic Orrery - Sacred Geometry Demo</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Monaco', 'Courier New', monospace;
+      background: #000511;
+      color: #fff;
+      overflow: hidden;
+    }
+    
+    #canvas-container {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+    }
+    
+    .controls {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: rgba(0, 5, 17, 0.8);
+      padding: 20px;
+      border-radius: 10px;
+      border: 1px solid rgba(67, 217, 255, 0.3);
+      backdrop-filter: blur(10px);
+      max-width: 300px;
+    }
+    
+    h2 {
+      color: #43d9ff;
+      margin-bottom: 15px;
+      font-size: 1.2em;
+    }
+    
+    .ritual-info {
+      margin: 15px 0;
+    }
+    
+    .ritual-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px;
+      margin: 5px 0;
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 5px;
+      font-size: 0.9em;
+    }
+    
+    .ritual-active {
+      background: rgba(67, 217, 255, 0.2);
+      border: 1px solid #43d9ff;
+    }
+    
+    .ritual-name {
+      flex: 1;
+    }
+    
+    .ritual-threshold {
+      color: #888;
+      font-size: 0.8em;
+      margin-left: 10px;
+    }
+    
+    .ritual-status {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #333;
+      margin-left: 10px;
+    }
+    
+    .ritual-status.active {
+      background: #00ff00;
+      box-shadow: 0 0 10px #00ff00;
+      animation: pulse 1s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    button {
+      width: 100%;
+      padding: 10px;
+      margin: 5px 0;
+      background: linear-gradient(90deg, #43d9ff, #b19cd9);
+      border: none;
+      border-radius: 5px;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    
+    button:hover {
+      transform: scale(1.05);
+    }
+    
+    .resonance-display {
+      margin: 20px 0;
+      padding: 15px;
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 5px;
+    }
+    
+    .resonance-bar {
+      width: 100%;
+      height: 20px;
+      background: #111;
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 10px 0;
+    }
+    
+    .resonance-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #ff0000, #ffff00, #00ff00);
+      width: 0%;
+      transition: width 0.3s;
+    }
+    
+    .resonance-value {
+      text-align: center;
+      font-size: 1.2em;
+      color: #43d9ff;
+    }
+    
+    .info {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      background: rgba(0, 5, 17, 0.8);
+      padding: 15px;
+      border-radius: 10px;
+      border: 1px solid rgba(67, 217, 255, 0.3);
+      backdrop-filter: blur(10px);
+      max-width: 300px;
+      font-size: 0.9em;
+      color: #888;
+    }
+    
+    .frequency {
+      color: #b19cd9;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div id="canvas-container"></div>
+  
+  <div class="controls">
+    <h2>🎭 Sacred Rituals</h2>
+    
+    <div class="ritual-info" id="ritual-list">
+      <!-- Populated by JavaScript -->
+    </div>
+    
+    <div class="resonance-display">
+      <div>Current Resonance:</div>
+      <div class="resonance-bar">
+        <div class="resonance-fill" id="resonance-fill"></div>
+      </div>
+      <div class="resonance-value" id="resonance-value">0.00</div>
+    </div>
+    
+    <h2 style="margin-top: 20px;">Test Patterns</h2>
+    <button onclick="testPattern('spiral')">🌀 Golden Spiral</button>
+    <button onclick="testPattern('flower')">🌸 Flower of Life</button>
+    <button onclick="testPattern('fractal')">🔺 Sierpinski Fractal</button>
+    <button onclick="testPattern('cube')">⬜ Metatron's Cube</button>
+    
+    <button style="margin-top: 20px; background: linear-gradient(90deg, #ff43d9, #43d9ff);" onclick="addRandomSoul()">
+      ✨ Add Code Soul
+    </button>
+  </div>
+  
+  <div class="info">
+    <strong>Sacred Geometry Integration</strong><br>
+    When code souls reach high resonance (>0.85), sacred patterns emerge:<br><br>
+    • <span class="frequency">432Hz</span> - Golden Spiral<br>
+    • <span class="frequency">528Hz</span> - Flower of Life<br>
+    • <span class="frequency">396Hz</span> - Sierpinski Fractal<br>
+    • <span class="frequency">963Hz</span> - Metatron's Cube<br><br>
+    Patterns adapted from Guardian Mandala 🎭
+  </div>
+  
+  <script type="module">
+    import { CosmicOrrery } from '../dist/cosmic-orrery.js';
+    import { OrreryVisualization } from '../dist/orrery-visualization.js';
+    
+    // Initialize orrery
+    const container = document.getElementById('canvas-container');
+    const orrery = new CosmicOrrery();
+    const visualization = new OrreryVisualization(container);
+    
+    // Test patterns
+    window.testPattern = (pattern) => {
+      visualization.testRitual(pattern);
+    };
+    
+    // Add random soul
+    window.addRandomSoul = () => {
+      // Generate random hash
+      const hash = Array.from({ length: 64 }, () => 
+        Math.floor(Math.random() * 16).toString(16)
+      ).join('');
+      
+      // Random eigenvalues for high resonance
+      const eigenvalues = Array.from({ length: 10 }, () => 
+        Math.random() * 2 + 0.5
+      );
+      
+      // Add to orrery
+      orrery.addSoul({
+        hash,
+        eigenvalues,
+        resonance: 0.8 + Math.random() * 0.2 // High resonance
+      });
+      
+      visualization.addBody(`soul-${Date.now()}`, hash);
+    };
+    
+    // Update ritual display
+    function updateRitualDisplay() {
+      const rituals = visualization.getRitualInfo();
+      const listEl = document.getElementById('ritual-list');
+      
+      listEl.innerHTML = rituals.map(ritual => `
+        <div class="ritual-item ${ritual.active ? 'ritual-active' : ''}">
+          <span class="ritual-name">${ritual.name}</span>
+          <span class="ritual-threshold">${(ritual.threshold * 100).toFixed(0)}%</span>
+          <div class="ritual-status ${ritual.active ? 'active' : ''}"></div>
+        </div>
+      `).join('');
+    }
+    
+    // Update resonance display
+    function updateResonance() {
+      // Get average resonance of all bodies
+      let totalResonance = 0;
+      let count = 0;
+      
+      orrery.getAllSouls().forEach(soul => {
+        const resonance = visualization.getResonance(soul.id);
+        if (resonance !== undefined) {
+          totalResonance += resonance;
+          count++;
+        }
+      });
+      
+      const avgResonance = count > 0 ? totalResonance / count : 0;
+      
+      document.getElementById('resonance-fill').style.width = `${avgResonance * 100}%`;
+      document.getElementById('resonance-value').textContent = avgResonance.toFixed(3);
+    }
+    
+    // Listen for ritual events
+    window.addEventListener('ritualActivated', (event) => {
+      console.log('🎭 Ritual Activated:', event.detail);
+      updateRitualDisplay();
+    });
+    
+    // Update displays periodically
+    setInterval(() => {
+      updateRitualDisplay();
+      updateResonance();
+    }, 100);
+    
+    // Add initial souls
+    for (let i = 0; i < 3; i++) {
+      setTimeout(() => addRandomSoul(), i * 1000);
+    }
+    
+    // Initial update
+    updateRitualDisplay();
+  </script>
+</body>
+</html>

@@ -6,6 +6,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { Kepler432Lattice, CelestialBody } from './kepler-432';
+import { RitualActivation } from './ritual-activation';
 
 export class OrreryVisualization {
   private scene: THREE.Scene;
@@ -19,10 +20,12 @@ export class OrreryVisualization {
     orbit: THREE.Line;
     data: CelestialBody;
     trail: THREE.Points;
+    resonance?: number;
   }>;
   
   private sun: THREE.Mesh;
   private time: number = 0;
+  private ritualActivation: RitualActivation;
   
   constructor(container: HTMLElement) {
     this.lattice = new Kepler432Lattice();
@@ -31,6 +34,9 @@ export class OrreryVisualization {
     // Initialize Three.js scene
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(0x000511); // Deep space blue
+    
+    // Initialize ritual activation system
+    this.ritualActivation = new RitualActivation(this.scene);
     
     // Camera setup
     this.camera = new THREE.PerspectiveCamera(
@@ -233,7 +239,7 @@ export class OrreryVisualization {
    * Update orbital positions based on time
    */
   private updateOrbits() {
-    this.bodies.forEach((body) => {
+    this.bodies.forEach((body, cid) => {
       const data = body.data;
       const coords = data.coordinates;
       
@@ -252,10 +258,45 @@ export class OrreryVisualization {
       // Update trail
       this.updateTrail(body);
       
+      // Calculate resonance based on harmonic alignment
+      const resonance = this.calculateResonance(data);
+      body.resonance = resonance;
+      
+      // Check for ritual activation
+      this.ritualActivation.checkActivation(cid, resonance, body.mesh.position);
+      
       // Pulsate based on harmonics
       const pulse = 1 + Math.sin(this.time * data.harmonics[0] * 0.01) * 0.1;
-      body.mesh.scale.setScalar(pulse);
+      body.mesh.scale.setScalar(pulse * (1 + resonance * 0.2)); // Enhanced pulse with resonance
     });
+  }
+  
+  /**
+   * Calculate resonance based on harmonic alignment
+   */
+  private calculateResonance(data: CelestialBody): number {
+    // Base resonance from Kohanist score
+    let resonance = data.kohanist;
+    
+    // Enhance based on harmonic convergence
+    const harmonicSum = data.harmonics.reduce((sum, freq, i) => {
+      // Check if frequency is close to sacred frequencies
+      const sacredFreqs = [432, 528, 396, 963, 639, 741, 852];
+      const closest = sacredFreqs.reduce((prev, curr) => 
+        Math.abs(curr - freq) < Math.abs(prev - freq) ? curr : prev
+      );
+      
+      const distance = Math.abs(freq - closest) / closest;
+      return sum + (1 - distance) / (i + 1); // Weight by harmonic position
+    }, 0);
+    
+    // Combine resonance factors
+    resonance = (resonance + harmonicSum / data.harmonics.length) / 2;
+    
+    // Add time-based oscillation for living effect
+    resonance += Math.sin(this.time * 2) * 0.05;
+    
+    return Math.max(0, Math.min(1, resonance)); // Clamp to [0, 1]
   }
   
   /**
@@ -292,6 +333,9 @@ export class OrreryVisualization {
     
     // Update orbital positions
     this.updateOrbits();
+    
+    // Update active rituals
+    this.ritualActivation.updateRituals(this.time);
     
     // Rotate sun
     this.sun.rotation.y += 0.002;
@@ -337,5 +381,27 @@ export class OrreryVisualization {
       this.scene.remove(body.trail);
     });
     this.bodies.clear();
+    this.ritualActivation.clearAllRituals();
+  }
+  
+  /**
+   * Get ritual information
+   */
+  getRitualInfo() {
+    return this.ritualActivation.getRitualInfo();
+  }
+  
+  /**
+   * Force activate a ritual for testing
+   */
+  testRitual(pattern: 'spiral' | 'fractal' | 'flower' | 'cube') {
+    this.ritualActivation.forceActivateRitual(pattern);
+  }
+  
+  /**
+   * Get body resonance level
+   */
+  getResonance(cid: string): number | undefined {
+    return this.bodies.get(cid)?.resonance;
   }
 }
