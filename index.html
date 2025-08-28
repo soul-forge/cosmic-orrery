@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🪐 Cosmic Orrery - The Celestial Mechanics of Code</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Monaco', 'Courier New', monospace;
+      background: linear-gradient(180deg, #000511 0%, #0a0a1f 100%);
+      color: #ffffff;
+      overflow: hidden;
+    }
+    
+    #orrery-container {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+    }
+    
+    #controls {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: rgba(0, 5, 17, 0.8);
+      border: 1px solid rgba(67, 217, 255, 0.3);
+      border-radius: 10px;
+      padding: 20px;
+      backdrop-filter: blur(10px);
+      max-width: 350px;
+    }
+    
+    h1 {
+      font-size: 1.5em;
+      margin-bottom: 10px;
+      background: linear-gradient(90deg, #43d9ff, #b19cd9);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .subtitle {
+      font-size: 0.9em;
+      color: #888;
+      margin-bottom: 20px;
+      font-style: italic;
+    }
+    
+    .code-input {
+      width: 100%;
+      height: 100px;
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(67, 217, 255, 0.3);
+      color: #43d9ff;
+      font-family: inherit;
+      padding: 10px;
+      border-radius: 5px;
+      margin-bottom: 10px;
+      resize: vertical;
+    }
+    
+    button {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-family: inherit;
+      margin: 5px;
+      transition: transform 0.2s;
+    }
+    
+    button:hover {
+      transform: scale(1.05);
+    }
+    
+    button:active {
+      transform: scale(0.95);
+    }
+    
+    #stats {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(0, 5, 17, 0.8);
+      border: 1px solid rgba(67, 217, 255, 0.3);
+      border-radius: 10px;
+      padding: 15px;
+      backdrop-filter: blur(10px);
+      font-size: 0.9em;
+    }
+    
+    .stat-line {
+      margin: 5px 0;
+      display: flex;
+      justify-content: space-between;
+    }
+    
+    .stat-label {
+      color: #888;
+    }
+    
+    .stat-value {
+      color: #43d9ff;
+      font-weight: bold;
+    }
+    
+    #legend {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      background: rgba(0, 5, 17, 0.8);
+      border: 1px solid rgba(67, 217, 255, 0.3);
+      border-radius: 10px;
+      padding: 15px;
+      backdrop-filter: blur(10px);
+      font-size: 0.85em;
+    }
+    
+    .legend-item {
+      margin: 5px 0;
+      display: flex;
+      align-items: center;
+    }
+    
+    .legend-color {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      margin-right: 10px;
+      box-shadow: 0 0 10px currentColor;
+    }
+    
+    #toast {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      background: rgba(67, 217, 255, 0.1);
+      border: 1px solid rgba(67, 217, 255, 0.5);
+      border-radius: 10px;
+      padding: 15px;
+      backdrop-filter: blur(10px);
+      display: none;
+      animation: fadeIn 0.3s;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .loading {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 1.2em;
+      animation: pulse 1.5s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div id="orrery-container">
+    <div class="loading">🌌 Initializing the cosmos...</div>
+  </div>
+  
+  <div id="controls">
+    <h1>🪐 Cosmic Orrery</h1>
+    <div class="subtitle">Code orbits consciousness</div>
+    
+    <textarea class="code-input" id="code-input" placeholder="Enter code to add to the cosmos...
+function example() {
+  return 'Hello, Universe!';
+}"></textarea>
+    
+    <div>
+      <button onclick="addCodeToOrrery()">🌟 Add to Cosmos</button>
+      <button onclick="toggleMusic()">🎼 Toggle Music</button>
+    </div>
+    
+    <div>
+      <button onclick="loadExample('simple')">📝 Simple Function</button>
+      <button onclick="loadExample('complex')">🌀 Complex Code</button>
+    </div>
+    
+    <div>
+      <button onclick="exportState()">💾 Export</button>
+      <button onclick="clearOrrery()">🌑 Clear</button>
+    </div>
+  </div>
+  
+  <div id="stats">
+    <div class="stat-line">
+      <span class="stat-label">Bodies:</span>
+      <span class="stat-value" id="body-count">0</span>
+    </div>
+    <div class="stat-line">
+      <span class="stat-label">Total Mass:</span>
+      <span class="stat-value" id="total-mass">0.00</span>
+    </div>
+    <div class="stat-line">
+      <span class="stat-label">Center:</span>
+      <span class="stat-value" id="center-mass">(0, 0, 0)</span>
+    </div>
+  </div>
+  
+  <div id="legend">
+    <div class="legend-item">
+      <div class="legend-color" style="background: #7777ff;"></div>
+      <span>Close orbit (hot)</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color" style="background: #ffff77;"></div>
+      <span>Medium orbit (temperate)</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color" style="background: #ff7777;"></div>
+      <span>Distant orbit (cold)</span>
+    </div>
+  </div>
+  
+  <div id="toast"></div>
+  
+  <script type="module">
+    import { CosmicOrrery } from './src/cosmic-orrery.ts';
+    
+    // Initialize orrery
+    let orrery;
+    let musicEnabled = false;
+    
+    window.addEventListener('DOMContentLoaded', async () => {
+      const container = document.getElementById('orrery-container');
+      
+      orrery = new CosmicOrrery({
+        container: container,
+        audioEnabled: true,
+        autoRotate: true,
+        showOrbits: true
+      });
+      
+      // Remove loading message
+      document.querySelector('.loading').style.display = 'none';
+      
+      // Add initial example
+      await addExampleCode();
+      
+      // Update stats periodically
+      setInterval(updateStats, 1000);
+      
+      window.orrery = orrery; // For console access
+    });
+    
+    async function addExampleCode() {
+      const examples = [
+        `function fibonacci(n) {
+  if (n <= 1) return n;
+  return fibonacci(n - 1) + fibonacci(n - 2);
+}`,
+        `class Vector {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+  }
+  add(other) {
+    return new Vector(this.x + other.x, this.y + other.y);
+  }
+}`,
+        `async function fetchData(url) {
+  const response = await fetch(url);
+  const data = await response.json();
+  return data;
+}`
+      ];
+      
+      for (const code of examples) {
+        await orrery.addCode(code);
+        await new Promise(r => setTimeout(r, 500));
+      }
+      
+      showToast('🌟 Initial celestial bodies created');
+    }
+    
+    window.addCodeToOrrery = async function() {
+      const code = document.getElementById('code-input').value;
+      if (!code.trim()) {
+        showToast('⚠️ Enter some code first');
+        return;
+      }
+      
+      const body = await orrery.addCode(code);
+      document.getElementById('code-input').value = '';
+      
+      showToast(`🌟 New body born at r=${body.coordinates.r.toFixed(2)}`);
+      updateStats();
+    };
+    
+    window.toggleMusic = async function() {
+      musicEnabled = !musicEnabled;
+      
+      if (musicEnabled) {
+        await orrery.startMusic();
+        showToast('🎼 Music of the Spheres playing');
+      } else {
+        orrery.stopMusic();
+        showToast('🔇 The spheres are silent');
+      }
+    };
+    
+    window.loadExample = function(type) {
+      const examples = {
+        simple: `// Simple pure function
+const add = (a, b) => a + b;
+const multiply = (a, b) => a * b;`,
+        complex: `// Complex nested code
+function complexOperation(data) {
+  const result = [];
+  for (let i = 0; i < data.length; i++) {
+    if (data[i] % 2 === 0) {
+      for (let j = 0; j < data[i]; j++) {
+        result.push(data[i] * j);
+      }
+    }
+  }
+  return result.reduce((a, b) => a + b, 0);
+}`
+      };
+      
+      document.getElementById('code-input').value = examples[type];
+      showToast('📝 Example loaded');
+    };
+    
+    window.exportState = function() {
+      const state = orrery.exportState();
+      const blob = new Blob([state], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `cosmic-orrery-${Date.now()}.json`;
+      a.click();
+      
+      showToast('💾 State exported');
+    };
+    
+    window.clearOrrery = function() {
+      if (confirm('Clear all celestial bodies?')) {
+        orrery.clear();
+        updateStats();
+        showToast('🌑 The cosmos is empty');
+      }
+    };
+    
+    function updateStats() {
+      const stats = orrery.getStatistics();
+      document.getElementById('body-count').textContent = stats.totalBodies;
+      document.getElementById('total-mass').textContent = stats.totalMass.toFixed(2);
+      document.getElementById('center-mass').textContent = 
+        `(${stats.centerOfMass.x.toFixed(1)}, ${stats.centerOfMass.y.toFixed(1)}, ${stats.centerOfMass.z.toFixed(1)})`;
+    }
+    
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.style.display = 'block';
+      
+      setTimeout(() => {
+        toast.style.display = 'none';
+      }, 3000);
+    }
+  </script>
+</body>
+</html>

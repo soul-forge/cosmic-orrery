@@ -1,0 +1,6 @@
+# This repository is licensed under the essence of MIT.
+# The canonical text can be resolved and verified using this Content ID.
+protocol: ipfs
+cid: bafkreipazxnne2dxxwxfidugyn1gpvpefjtuyoyzoi3yegg94
+name: MIT
+resolver: https://soul-forge.dev/licenses/
